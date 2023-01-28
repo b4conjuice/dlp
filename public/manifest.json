@@ -1,0 +1,8 @@
+{
+  "name": "disneyland planner",
+  "short_name": "dlp",
+  "lang": "en-US",
+  "start_url": "/",
+  "display": "standalone",
+  "scope": "/"
+}
