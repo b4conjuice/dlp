@@ -1,11 +1,16 @@
 import { type NextPage } from 'next'
-import { ListBulletIcon, PencilSquareIcon } from '@heroicons/react/24/solid'
+import {
+  DocumentDuplicateIcon,
+  ListBulletIcon,
+  PencilSquareIcon,
+} from '@heroicons/react/24/solid'
 
 import Main from '@/components/design/main'
 import Page from '@/components/page'
 import DragDropList from '@/components/dragDropList'
 import Footer from '@/components/design/footer'
 import useLocalStorage from '@/lib/useLocalStorage'
+import copyToClipboard from '@/lib/copyToClipboard'
 
 type Mode = 'text' | 'list'
 
@@ -51,6 +56,11 @@ const Home: NextPage = () => {
               <PencilSquareIcon className='h-6 w-6' />
             </button>
           )}
+        </li>
+        <li className='flex flex-grow justify-center py-2'>
+          <button type='button' onClick={() => copyToClipboard(text)}>
+            <DocumentDuplicateIcon className='h-6 w-6' />
+          </button>
         </li>
       </Footer>
     </Page>
