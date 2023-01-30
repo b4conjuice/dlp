@@ -22,7 +22,7 @@ export default function DragDropList<T extends DragDropListItemType>({
   items: Array<T>
   setItems: (items: Array<T>) => void
   renderItem: (item: T, index: number) => React.ReactNode
-  itemContainerClassName?: string
+  itemContainerClassName?: string | (() => string)
   listContainerClassName?: string
 }) {
   return (
@@ -73,7 +73,13 @@ export default function DragDropList<T extends DragDropListItemType>({
                   {provided => {
                     return (
                       <div
-                        className={itemContainerClassName}
+                        className={
+                          typeof itemContainerClassName === 'string'
+                            ? itemContainerClassName
+                            : itemContainerClassName
+                            ? itemContainerClassName()
+                            : undefined
+                        }
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
