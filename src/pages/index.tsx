@@ -46,19 +46,31 @@ const Home: NextPage = () => {
         )}
       </Main>
       <Footer>
-        <li className='flex flex-grow justify-center py-2'>
+        <li className='flex-grow'>
           {mode === 'text' ? (
-            <button type='button' onClick={() => setMode('list')}>
+            <button
+              className='flex w-full justify-center py-2'
+              type='button'
+              onClick={() => setMode('list')}
+            >
               <ListBulletIcon className='h-6 w-6' />
             </button>
           ) : (
-            <button type='button' onClick={() => setMode('text')}>
+            <button
+              className='flex w-full justify-center py-2'
+              type='button'
+              onClick={() => setMode('text')}
+            >
               <PencilSquareIcon className='h-6 w-6' />
             </button>
           )}
         </li>
-        <li className='flex flex-grow justify-center py-2'>
-          <button type='button' onClick={() => copyToClipboard(text)}>
+        <li className='flex-grow'>
+          <button
+            className='flex w-full justify-center py-2'
+            type='button'
+            onClick={() => copyToClipboard(text)}
+          >
             <DocumentDuplicateIcon className='h-6 w-6' />
           </button>
         </li>
