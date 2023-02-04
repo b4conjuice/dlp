@@ -1,5 +1,6 @@
 import { type NextPage } from 'next'
 import {
+  ArrowDownOnSquareIcon,
   DocumentDuplicateIcon,
   ListBulletIcon,
   PencilSquareIcon,
@@ -8,31 +9,67 @@ import {
 import Main from '@/components/design/main'
 import Page from '@/components/page'
 import DragDropList from '@/components/dragDropList'
-import Footer from '@/components/design/footer'
+import Footer, { FooterListItem } from '@/components/design/footer'
 import useLocalStorage from '@/lib/useLocalStorage'
 import copyToClipboard from '@/lib/copyToClipboard'
+import { api } from '@/lib/api'
+import { useEffect, useState } from 'react'
+import type { Note } from '@prisma/client'
 
 type Mode = 'text' | 'list'
 
 const Home: NextPage = () => {
-  const [text, setText] = useLocalStorage('dlp-plan', '')
+  const { data: note } = api.notes.get.useQuery()
+  // const [text, setText] = useLocalStorage('dlp-plan', '')
   const [mode, setMode] = useLocalStorage<Mode>('dlp-mode', 'text')
 
-  const textAsList = (text ?? '').split('\n')
+  const [body, setBody] = useState<string>((note?.body as string) ?? '')
+  useEffect(() => {
+    setBody(note?.body as string)
+  }, [note])
+  const utils = api.useContext()
+  const { mutate: updateNote } = api.notes.save.useMutation({
+    // https://create.t3.gg/en/usage/trpc#optimistic-updates
+    async onMutate(newNote) {
+      // Cancel outgoing fetches (so they don't overwrite our optimistic update)
+      await utils.notes.get.cancel()
+
+      // Get the data from the queryCache
+      const prevData = utils.notes.get.getData()
+
+      // Optimistically update the data with our new post
+      utils.notes.get.setData(undefined, () => newNote as Note)
+
+      // Return the previous data so we can revert if something goes wrong
+      return { prevData }
+    },
+    onError(err, newNote, ctx) {
+      // If the mutation fails, use the context-value from onMutate
+      utils.notes.get.setData(undefined, ctx?.prevData)
+    },
+    async onSettled() {
+      // Sync with server once mutation has settled
+      await utils.notes.get.invalidate()
+    },
+  })
+
+  const textAsList = (body ?? '').split('\n')
   return (
     <Page>
       <Main className='flex flex-col p-4'>
         {mode === 'list' ? (
           <div className='space-y-3'>
             <DragDropList
-              items={textAsList.map(item => ({ id: item, item }))}
+              items={textAsList
+                // .filter(item => item)
+                .map(item => ({ id: item, item }))}
               renderItem={({ item }: { item: string }, index: number) => (
                 <div key={index} className='rounded-lg bg-cobalt p-3'>
                   {index + 1}. {item}
                 </div>
               )}
               setItems={newItems => {
-                setText(newItems.map(({ item }) => item).join('\n'))
+                setBody(newItems.map(({ item }) => item).join('\n'))
               }}
               listContainerClassName='space-y-3'
             />
@@ -40,40 +77,39 @@ const Home: NextPage = () => {
         ) : (
           <textarea
             className='h-full w-full flex-grow bg-cobalt'
-            value={text}
-            onChange={e => setText(e.target.value)}
+            value={body}
+            onChange={e => setBody(e.target.value)}
           />
         )}
       </Main>
       <Footer>
-        <li className='flex-grow'>
-          {mode === 'text' ? (
-            <button
-              className='flex w-full justify-center py-2'
-              type='button'
-              onClick={() => setMode('list')}
-            >
-              <ListBulletIcon className='h-6 w-6' />
-            </button>
-          ) : (
-            <button
-              className='flex w-full justify-center py-2'
-              type='button'
-              onClick={() => setMode('text')}
-            >
-              <PencilSquareIcon className='h-6 w-6' />
-            </button>
-          )}
-        </li>
-        <li className='flex-grow'>
-          <button
-            className='flex w-full justify-center py-2'
-            type='button'
-            onClick={() => copyToClipboard(text)}
-          >
-            <DocumentDuplicateIcon className='h-6 w-6' />
-          </button>
-        </li>
+        {mode === 'text' ? (
+          <FooterListItem onClick={() => setMode('list')}>
+            <ListBulletIcon className='h-6 w-6' />
+          </FooterListItem>
+        ) : (
+          <FooterListItem onClick={() => setMode('text')}>
+            <PencilSquareIcon className='h-6 w-6' />
+          </FooterListItem>
+        )}
+        <FooterListItem onClick={() => copyToClipboard(body)}>
+          <DocumentDuplicateIcon className='h-6 w-6' />
+        </FooterListItem>
+        <FooterListItem
+          onClick={() => {
+            if (note) {
+              const newNote = {
+                ...note,
+                text: `${note?.title ?? ''}\n\n${body}`,
+                body,
+              }
+              updateNote(newNote)
+            }
+          }}
+          disabled={body === note?.body}
+        >
+          <ArrowDownOnSquareIcon className='h-6 w-6' />
+        </FooterListItem>
       </Footer>
     </Page>
   )

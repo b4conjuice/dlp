@@ -6,8 +6,10 @@ import { z } from "zod";
  * This way you can ensure the app isn't built with invalid env vars.
  */
 export const serverSchema = z.object({
-  NODE_ENV: z.enum(["development", "test", "production"]),
-});
+  DATABASE_URL: z.string().url(),
+  NODE_ENV: z.enum(['development', 'test', 'production']),
+  DLP_ID: z.string(),
+})
 
 /**
  * You can't destruct `process.env` as a regular object in the Next.js
@@ -15,8 +17,10 @@ export const serverSchema = z.object({
  * @type {{ [k in keyof z.infer<typeof serverSchema>]: z.infer<typeof serverSchema>[k] | undefined }}
  */
 export const serverEnv = {
+  DATABASE_URL: process.env.DATABASE_URL,
   NODE_ENV: process.env.NODE_ENV,
-};
+  DLP_ID: process.env.DLP_ID,
+}
 
 /**
  * Specify your client-side environment variables schema here.
