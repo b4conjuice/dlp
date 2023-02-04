@@ -7,6 +7,7 @@ import {
   ListBulletIcon,
   PencilSquareIcon,
 } from '@heroicons/react/24/solid'
+import { toast } from 'react-toastify'
 
 import Main from '@/components/design/main'
 import Page from '@/components/page'
@@ -106,7 +107,12 @@ const Home: NextPage = () => {
             <PencilSquareIcon className='h-6 w-6' />
           </FooterListItem>
         )}
-        <FooterListItem onClick={() => copyToClipboard(body)}>
+        <FooterListItem
+          onClick={() => {
+            copyToClipboard(body)
+            toast.success('copied to clipboard')
+          }}
+        >
           <DocumentDuplicateIcon className='h-6 w-6' />
         </FooterListItem>
         <FooterListItem

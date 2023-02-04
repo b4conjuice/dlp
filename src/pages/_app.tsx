@@ -1,4 +1,5 @@
 import { type AppType } from 'next/app'
+import 'react-toastify/dist/ReactToastify.min.css'
 
 import { api } from '@/lib/api'
 
