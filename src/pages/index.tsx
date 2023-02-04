@@ -1,6 +1,7 @@
 import { type NextPage } from 'next'
 import {
   ArrowDownOnSquareIcon,
+  ArrowPathIcon,
   DocumentDuplicateIcon,
   ListBulletIcon,
   PencilSquareIcon,
@@ -19,7 +20,7 @@ import type { Note } from '@prisma/client'
 type Mode = 'text' | 'list'
 
 const Home: NextPage = () => {
-  const { data: note } = api.notes.get.useQuery()
+  const { data: note, refetch } = api.notes.get.useQuery()
   // const [text, setText] = useLocalStorage('dlp-plan', '')
   const [mode, setMode] = useLocalStorage<Mode>('dlp-mode', 'text')
 
@@ -83,6 +84,13 @@ const Home: NextPage = () => {
         )}
       </Main>
       <Footer>
+        <FooterListItem
+          onClick={() => {
+            refetch().catch(err => console.log(err))
+          }}
+        >
+          <ArrowPathIcon className='h-6 w-6' />
+        </FooterListItem>
         {mode === 'text' ? (
           <FooterListItem onClick={() => setMode('list')}>
             <ListBulletIcon className='h-6 w-6' />
