@@ -1,4 +1,3 @@
-import type { ToastClassName } from 'react-toastify'
 import { ToastContainer } from 'react-toastify'
 
 import Meta from '@/components/meta'

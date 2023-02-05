@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import { type NextPage } from 'next'
+import type { Note } from '@prisma/client'
 import classnames from 'classnames'
 import {
   ArrowDownOnSquareIcon,
@@ -16,13 +18,17 @@ import Footer, { FooterListItem } from '@/components/design/footer'
 import useLocalStorage from '@/lib/useLocalStorage'
 import copyToClipboard from '@/lib/copyToClipboard'
 import { api } from '@/lib/api'
-import { useEffect, useState } from 'react'
-import type { Note } from '@prisma/client'
+import Loading from '@/components/loading'
 
 type Mode = 'text' | 'list'
 
 const Home: NextPage = () => {
-  const { data: note, refetch, isRefetching } = api.notes.get.useQuery()
+  const {
+    data: note,
+    refetch,
+    isRefetching,
+    isLoading,
+  } = api.notes.get.useQuery()
   // const [text, setText] = useLocalStorage('dlp-plan', '')
   const [mode, setMode] = useLocalStorage<Mode>('dlp-mode', 'text')
 
@@ -60,7 +66,9 @@ const Home: NextPage = () => {
   return (
     <Page>
       <Main className='flex flex-col p-4'>
-        {mode === 'list' ? (
+        {isLoading ? (
+          <Loading />
+        ) : mode === 'list' ? (
           <div className='space-y-3'>
             <DragDropList
               items={textAsList
