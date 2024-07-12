@@ -10,6 +10,7 @@ import {
   PencilSquareIcon,
 } from '@heroicons/react/24/solid'
 import { toast } from 'react-toastify'
+import { useDebounce } from '@uidotdev/usehooks'
 
 import Main from '@/components/design/main'
 import Page from '@/components/page'
@@ -33,9 +34,11 @@ const Home: NextPage = () => {
   const [mode, setMode] = useLocalStorage<Mode>('dlp-mode', 'text')
 
   const [body, setBody] = useState<string>((note?.body as string) ?? '')
+  const debouncedBody = useDebounce(body, 500)
   useEffect(() => {
     setBody(note?.body as string)
   }, [note])
+
   const utils = api.useContext()
   const { mutate: updateNote } = api.notes.save.useMutation({
     // https://create.t3.gg/en/usage/trpc#optimistic-updates
@@ -61,6 +64,16 @@ const Home: NextPage = () => {
       await utils.notes.get.invalidate()
     },
   })
+
+  useEffect(() => {
+    const newNote = {
+      ...note,
+      text: `${note?.title ?? ''}\n\n${body}`,
+      body,
+      author: note?.author ?? '',
+    }
+    updateNote(newNote)
+  }, [debouncedBody])
 
   const textAsList = (body ?? '').split('\n')
   return (
