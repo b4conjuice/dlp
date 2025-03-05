@@ -1,7 +1,6 @@
 import type { Viewport } from 'next'
-import { ToastContainer } from 'react-toastify'
+import { TRPCReactProvider } from '@/trpc/react'
 
-import 'react-toastify/dist/ReactToastify.min.css'
 import '@/styles/globals.css'
 
 const DEFAULT_TITLE = 'disneyland planner'
@@ -29,15 +28,11 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body>
-        <div className='flex min-h-screen flex-col bg-cb-dark-blue text-cb-white'>
-          <ToastContainer
-            autoClose={1000}
-            toastClassName='bg-cb-off-blue text-cb-white rounded-lg'
-            bodyClassName=''
-            pauseOnFocusLoss={false}
-          />
-          {children}
-        </div>
+        <TRPCReactProvider>
+          <div className='flex min-h-screen flex-col bg-cb-dark-blue text-cb-white'>
+            {children}
+          </div>
+        </TRPCReactProvider>
       </body>
     </html>
   )

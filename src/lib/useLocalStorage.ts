@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react'
 
-export default function useLocalStorage<T>(key: string, initialValue?: T) {
+export default function useLocalStorage<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T | undefined>()
 
   const setValue = (value: T) => {
@@ -25,7 +25,7 @@ export default function useLocalStorage<T>(key: string, initialValue?: T) {
   }, [])
 
   useEffect(() => {
-    if (storedValue) {
+    if (storedValue !== undefined) {
       setValue(storedValue)
     }
   }, [storedValue])

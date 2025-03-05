@@ -1,21 +1,25 @@
-import { unstable_noStore as noStore } from 'next/cache'
+import { Suspense } from 'react'
 
-import Main from '@/components/design/main'
-import Title from '@/components/design/title'
-import Note from './_components/Note'
-import { getNote } from '@/server/queries'
+import { Main } from '@/components/ui'
+import Note from './note'
+import { getNote } from '@/server/db/notes'
 
 export default async function Home() {
-  noStore()
-  const note = await getNote(process.env.DLP_ID!)
+  const note = await getNote(Number(process.env.NOTE_ID))
   if (!note) {
     return (
-      <Main className='flex flex-col p-4'>
-        <div className='flex flex-grow flex-col items-center justify-center space-y-4'>
-          <Title>disneyland planner</Title>
-        </div>
-      </Main>
+      <>
+        <Main className='flex flex-col px-4 pb-4'>
+          <div className='flex flex-grow flex-col space-y-4'>
+            <p>note does not exist</p>
+          </div>
+        </Main>
+      </>
     )
   }
-  return <Note note={note} />
+  return (
+    <Suspense>
+      <Note note={note} />
+    </Suspense>
+  )
 }
