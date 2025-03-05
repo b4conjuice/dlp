@@ -2,7 +2,7 @@
 
 import 'server-only'
 
-import { and, eq } from 'drizzle-orm'
+import { and } from 'drizzle-orm'
 
 import { type Note } from '@/lib/types'
 import { db } from '@/server/db'
@@ -15,11 +15,19 @@ export async function saveNote(note: Note) {
   }
 
   const newNotes = await db
-    .update(notes)
-    .set({
-      ...note,
+    .insert(notes)
+    .values(note)
+    .onConflictDoUpdate({
+      target: notes.id,
+      set: {
+        text: note.text,
+        title: note.title,
+        body: note.body,
+        // list,
+        tags: note.tags,
+        // markdown,
+      },
     })
-    .where(eq(notes.id, id))
     .returning()
 
   if (!newNotes || newNotes.length < 0) {
