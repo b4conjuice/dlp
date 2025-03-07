@@ -61,7 +61,7 @@ export default function Note({ note }: { note: Note }) {
     if (isSignedIn && canSave) {
       void updateNote()
     }
-  }, [debouncedText, canSave, isSignedIn, note, text])
+  }, [debouncedText])
 
   const [title, _, ...items] = text.split('\n')
   const url = `${window.location.origin}${window.location.pathname}`
